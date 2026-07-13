@@ -2,7 +2,6 @@
 # FongMi/TVBox Python Spider - 天天A片 ttap21.life
 import re, json
 from urllib.parse import urljoin, quote, unquote
-
 try:
     from base.spider import Spider as BaseSpider
 except Exception:
@@ -31,7 +30,6 @@ class Spider(BaseSpider):
         self.filters = {}
         for k,v in self.groups.items():
             self.filters[k] = [{'key':'cate','name':'分类','value':[{'n':'全部','v':''}] + [{'n':name,'v':tid} for tid,name in v['items']]}]
-        return "" # 显式返回空字符串，增强对壳的兼容性
 
     def homeContent(self, filter): return {'class': self.classes, 'filters': self.filters if filter else {}}
     def homeVideoContent(self): return {'list': self.parseList(self.host + '/')}
@@ -109,11 +107,8 @@ class Spider(BaseSpider):
     def firstChild(self, tid):
         g = self.groups.get(str(tid)); return g['items'][0][0] if g and g.get('items') else str(tid)
     def html(self, url):
-        try:
-            r = self.fetch(url, headers=self.headers, timeout=15)
-            return r.content.decode('utf-8','ignore') if hasattr(r,'content') else getattr(r,'text','')
-        except Exception:
-            return ""
+        r = self.fetch(url, headers=self.headers, timeout=15)
+        return r.content.decode('utf-8','ignore') if hasattr(r,'content') else getattr(r,'text','')
     def fix(self, url): return urljoin(self.host + '/', (url or '').replace('&amp;','&').strip()) if url else ''
     def find1(self, txt, pat):
         m = re.search(pat, txt or '', re.I); return m.group(1) if m else ''
